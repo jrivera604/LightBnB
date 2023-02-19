@@ -2,6 +2,7 @@ const properties = require('./json/properties.json');
 const users = require('./json/users.json');
 const { Pool } = require('pg');
 
+// connection to lightbnb database
 const pool = new Pool({
   user: 'vagrant',
   password: '123',
@@ -9,17 +10,10 @@ const pool = new Pool({
   database: 'lightbnb'
 });
 
-// the following assumes that you named your connection variable `pool`
 pool.query(`SELECT title FROM properties LIMIT 10;`).then(response => {response})
 
-/// Users
-
-/**
- * Get a single user from the database given their email.
- * @param {String} email The email of the user.
- * @return {Promise<{}>} A promise to the user.
- */
  const getUserWithEmail = function(email) {
+  // SQL query to retrieve user with given email
   const queryString = `
     SELECT *
     FROM users
@@ -41,11 +35,7 @@ pool.query(`SELECT title FROM properties LIMIT 10;`).then(response => {response}
 }
 exports.getUserWithEmail = getUserWithEmail;
 
-/**
- * Get a single user from the database given their id.
- * @param {string} id The id of the user.
- * @return {Promise<{}>} A promise to the user.
- */
+// getUserWithId function accepts a user id
  const getUserWithId = function(id) {
   const queryString = `
     SELECT *
@@ -68,12 +58,7 @@ exports.getUserWithEmail = getUserWithEmail;
 }
 exports.getUserWithId = getUserWithId;
 
-
-/**
- * Add a new user to the database.
- * @param {Object} user An object containing the user's name, email, and password properties.
- * @return {Promise<{}>} A promise to the new user object, with the id property set to the id of the new user.
- */
+// Register a user to the database
  const addUser = function(user) {
   const queryString = `
     INSERT INTO users (name, email, password)
@@ -91,13 +76,7 @@ exports.getUserWithId = getUserWithId;
 }
 exports.addUser = addUser;
 
-/// Reservations
-
-/**
- * Get all reservations for a single user.
- * @param {string} guest_id The id of the user.
- * @return {Promise<[{}]>} A promise to the reservations.
- */
+// Get all reservations for a given user
  const getAllReservations = function(guest_id, limit = 10) {
   const query = `
     SELECT reservations.*, properties.*, avg(rating) as average_rating
@@ -121,14 +100,7 @@ exports.addUser = addUser;
 };
 exports.getAllReservations = getAllReservations;
 
-/// Properties
-
-/**
- * Get all properties.
- * @param {{}} options An object containing query options.
- * @param {*} limit The number of results to return.
- * @return {Promise<[{}]>}  A promise to the properties.
- */
+// Get all available properties from the database with specific params that are given by user
  const getAllProperties = function (options, limit = 10) {
   const queryParams = [];
   let queryString = `
@@ -191,7 +163,7 @@ exports.getAllReservations = getAllReservations;
 
 exports.getAllProperties = getAllProperties;
 
-
+// Allow logged in user to list a property
 const addProperty = function(property) {
   const queryValues = [
     property.owner_id,
